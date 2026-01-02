@@ -8,10 +8,10 @@ echo ""
 
 ips_url="https://raw.githubusercontent.com/MohsenBg/scanner/refs/heads/main/ips.txt"
 
-# Download ips.txt file using curl
-# echo -e "\033[1;34mDownloading ips.txt file...\033[0m"
-# curl -s -o "ips.txt" "$ips_url"
-#
+Download ips.txt file using curl
+echo -e "\033[1;34mDownloading ips.txt file...\033[0m"
+curl -s -o "ips.txt" "$ips_url"
+
 ip_file="ips.txt"
 
 # Check if the download was successful
