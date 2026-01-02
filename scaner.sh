@@ -6,10 +6,15 @@ echo -e "\033[1;32mThis script was made by MOHSEN BG.\033[0m"
 echo -e "\033[1;34mStarting the IP scan...\033[0m"
 echo ""
 
-# Set the path to your text file
+ips_url="https://raw.githubusercontent.com/MohsenBg/scanner/refs/heads/main/ips.txt"
+
+# Download ips.txt file using curl
+echo -e "\033[1;34mDownloading ips.txt file...\033[0m"
+curl -s -o "ips.txt" "$ips_url"
+
 ip_file="ips.txt"
 
-# Check if the text file exists
+# Check if the download was successful
 if [ ! -f "$ip_file" ]; then
 	echo -e "\033[1;31mIP file not found! Please check the file path.\033[0m"
 	exit 1
@@ -52,7 +57,7 @@ while IFS= read -r ip; do
 	echo -e "\033[1;36mScanning IP #$count: $ip\033[0m"
 
 	# Perform a simple ping to check if the IP is reachable and get the ping time
-	ping_output=$(ping -c 1 "$ip" 2>/dev/null) # Suppress errors
+	ping_output=$(ping -c 1 -t1 "$ip" 2>/dev/null) # Suppress errors
 	ping_time=$(echo "$ping_output" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
 
 	# Check if we got a valid ping time
@@ -73,7 +78,7 @@ if [ -f "$temp_file" ]; then
 		# Extract ping time and IP from the sorted result and display both
 		ping_time=$(echo $line | awk '{print $1}')
 		ip=$(echo $line | awk '{print $2}')
-		echo -e "\033[1;32m$ip -> $ping_time ms\033[0m"
+		echo $ip
 	done
 	rm -f "$temp_file"
 else
