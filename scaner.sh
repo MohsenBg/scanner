@@ -30,12 +30,8 @@ temp_file=$(mktemp)
 # Define a function to handle Ctrl+C (SIGINT) and show the found IPs
 handle_interrupt() {
 	echo -e "\033[1;33mScript interrupted! Showing reachable IPs found so far...\033[0m"
-
-	# Sort reachable IPs by ping time (ascending order) and display the results
 	if [ -f "$temp_file" ]; then
-		# Sort the file by the first column (ping time) and print the IP along with the ping time
 		sort -n "$temp_file" | while read line; do
-			# Extract ping time and IP, and display both
 			ping_time=$(echo $line | awk '{print $1}')
 			ip=$(echo $line | awk '{print $2}')
 			echo $ip
@@ -56,14 +52,13 @@ while IFS= read -r ip; do
 	((count++))
 	echo -e "\033[1;36mScanning IP #$count: $ip\033[0m"
 
-	# Perform a simple ping to check if the IP is reachable and get the ping time
+	# Perform a simple ping to check if the IP is reachable
 	ping_output=$(ping -c 1 $ip 2>/dev/null) # Suppress errors
-
-	echo $(ping -c 1 $ip)
-
-	ping_time=$(echo "$ping_output" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
+	echo "Ping output: $ping_output"         # Debugging line
 
 	# Check if we got a valid ping time
+	ping_time=$(echo "$ping_output" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
+
 	if [ -n "$ping_time" ]; then
 		# Save the IP and its ping time to the temporary file
 		echo "$ping_time $ip" >>"$temp_file"
@@ -78,7 +73,6 @@ done <"$ip_file"
 if [ -f "$temp_file" ]; then
 	echo -e "\033[1;33mReachable IPs sorted by best ping time:\033[0m"
 	sort -n "$temp_file" | while read line; do
-		# Extract ping time and IP from the sorted result and display both
 		ping_time=$(echo $line | awk '{print $1}')
 		ip=$(echo $line | awk '{print $2}')
 		echo $ip
