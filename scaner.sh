@@ -9,9 +9,9 @@ echo ""
 ips_url="https://raw.githubusercontent.com/MohsenBg/scanner/refs/heads/main/ips.txt"
 
 # Download ips.txt file using curl
-echo -e "\033[1;34mDownloading ips.txt file...\033[0m"
-curl -s -o "ips.txt" "$ips_url"
-
+# echo -e "\033[1;34mDownloading ips.txt file...\033[0m"
+# curl -s -o "ips.txt" "$ips_url"
+#
 ip_file="ips.txt"
 
 # Check if the download was successful
@@ -57,7 +57,7 @@ while IFS= read -r ip; do
 	echo -e "\033[1;36mScanning IP #$count: $ip\033[0m"
 
 	# Perform a simple ping to check if the IP is reachable and get the ping time
-	ping_output=$(ping -c 1 -t1 "$ip" 2>/dev/null) # Suppress errors
+	ping_output=$(ping -c 1 -W 1 "$ip" 2>/dev/null) # Suppress errors
 	ping_time=$(echo "$ping_output" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
 
 	# Check if we got a valid ping time
