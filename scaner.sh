@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Print a welcoming message
 echo -e "\033[1;33mWelcome to the IP Scanner!\033[0m"
 echo -e "\033[1;32mThis script was made by MOHSEN BG.\033[0m"
 echo -e "\033[1;34mStarting the IP scan...\033[0m"
@@ -8,78 +7,56 @@ echo ""
 
 ips_url="https://raw.githubusercontent.com/MohsenBg/scanner/refs/heads/main/ips.txt"
 
-# Download ips.txt file using curl
 echo -e "\033[1;34mDownloading ips.txt file...\033[0m"
-curl -s -o "ips.txt" "$ips_url"
+curl -s -o ips.txt "$ips_url"
 
 ip_file="ips.txt"
 
-# Check if the download was successful
 if [ ! -f "$ip_file" ]; then
-	echo -e "\033[1;31mIP file not found! Please check the file path.\033[0m"
+	echo -e "\033[1;31mIP file not found!\033[0m"
 	exit 1
 fi
 
-# Start reading the ips.txt file line by line
-echo -e "\033[1;34mReading IPs from the file...\033[0m"
-echo ""
-
-# Temporary file to store the reachable IPs with their ping times
 temp_file=$(mktemp)
 
-# Define a function to handle Ctrl+C (SIGINT) and show the found IPs
 handle_interrupt() {
-	echo -e "\033[1;33mScript interrupted! Showing reachable IPs found so far...\033[0m"
-	if [ -f "$temp_file" ]; then
-		sort -n "$temp_file" | while read line; do
-			ping_time=$(echo $line | awk '{print $1}')
-			ip=$(echo $line | awk '{print $2}')
-			echo $ip
-		done
-		rm -f "$temp_file"
+	echo -e "\n\033[1;33mInterrupted! Reachable IPs so far:\033[0m"
+	if [ -s "$temp_file" ]; then
+		cat "$temp_file"
 	else
-		echo -e "\033[1;31mNo reachable IPs found.\033[0m"
+		echo -e "\033[1;31mNone found.\033[0m"
 	fi
+	rm -f "$temp_file"
 	exit 1
 }
 
-# Trap Ctrl+C (SIGINT) and call the handle_interrupt function
 trap handle_interrupt SIGINT
 
-# Loop through each IP in the file
 count=0
 while IFS= read -r ip; do
+	# sanitize input (IMPORTANT)
+	ip=$(echo "$ip" | tr -d '\r[:space:]')
+	[ -z "$ip" ] && continue
+
 	((count++))
-	echo -e "\033[1;36mScanning IP #$count: $ip\033[0m"
+	echo -e "\033[1;36m[$count] Scanning $ip\033[0m"
 
-	# Perform a simple ping to check if the IP is reachable
-	ping_output=$(ping -c 1 $ip 2>/dev/null) # Suppress errors
-	echo "Ping output: $ping_output"         # Debugging line
-
-	# Check if we got a valid ping time
-	ping_time=$(echo "$ping_output" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
-
-	if [ -n "$ping_time" ]; then
-		# Save the IP and its ping time to the temporary file
-		echo "$ping_time $ip" >>"$temp_file"
-		echo -e "\033[1;32m$ip is reachable with ping time: $ping_time ms\033[0m"
+	# TCP test on port 443 with 1s timeout
+	if nc -z -w 1 "$ip" 443 >/dev/null 2>&1; then
+		echo -e "\033[1;32m$ip is reachable (TCP 443)\033[0m"
+		echo "$ip" >>"$temp_file"
 	else
-		echo -e "\033[1;31m$ip is not reachable.\033[0m"
+		echo -e "\033[1;31m$ip is not reachable\033[0m"
 	fi
 
 done <"$ip_file"
 
-# Sort reachable IPs by ping time (ascending order) and display the results
-if [ -f "$temp_file" ]; then
-	echo -e "\033[1;33mReachable IPs sorted by best ping time:\033[0m"
-	sort -n "$temp_file" | while read line; do
-		ping_time=$(echo $line | awk '{print $1}')
-		ip=$(echo $line | awk '{print $2}')
-		echo $ip
-	done
-	rm -f "$temp_file"
+echo -e "\n\033[1;33mReachable IPs:\033[0m"
+if [ -s "$temp_file" ]; then
+	cat "$temp_file"
 else
-	echo -e "\033[1;31mNo reachable IPs found.\033[0m"
+	echo -e "\033[1;31mNone found.\033[0m"
 fi
 
-echo -e "\033[1;33mIP scan completed!\033[0m"
+rm -f "$temp_file"
+echo -e "\033[1;33mScan completed.\033[0m"
