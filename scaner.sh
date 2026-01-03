@@ -32,6 +32,9 @@ handle_interrupt() {
 
 trap handle_interrupt SIGINT
 
+shuffled_file=$(mktemp)
+awk 'BEGIN{srand()} {print rand(), $0}' "$ip_file" | sort -n | cut -d' ' -f2- >"$shuffled_file"
+
 count=0
 while IFS= read -r ip; do
 	# sanitize input (IMPORTANT)
@@ -49,7 +52,7 @@ while IFS= read -r ip; do
 		echo -e "\033[1;31m$ip is not reachable\033[0m"
 	fi
 
-done <"$ip_file"
+done <"$shuffled_file"
 
 echo -e "\n\033[1;33mReachable IPs:\033[0m"
 if [ -s "$temp_file" ]; then
