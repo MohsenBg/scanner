@@ -85,6 +85,30 @@ test_ip() {
   fi
 }
 
+handle_interrupt() {
+  echo -e "\n\033[1;33mInterrupted! Valid IPs found so far:\033[0m"
+
+  # stop all parallel workers
+  kill 0 2>/dev/null
+
+  if [ -s "$temp_file" ]; then
+    echo -e "\033[1;32m----------------------------------------\033[0m"
+    cat "$temp_file"
+    echo -e "\033[1;32m----------------------------------------\033[0m"
+
+    cp "$temp_file" "$RESULT_FILE"
+    echo -e "\n\033[1;36mSaved results to:\033[0m"
+    echo -e "\033[1;34m$RESULT_FILE\033[0m"
+  else
+    echo -e "\033[1;31mNo valid IPs found.\033[0m"
+  fi
+
+  rm -f "$temp_file" "$shuffled_file"
+  exit 130
+}
+
+trap handle_interrupt SIGINT
+
 export -f test_ip
 
 # ----- run in parallel -----
@@ -92,14 +116,18 @@ cat "$shuffled_file" |
   xargs -n 1 -P "$PARALLEL" bash -c 'test_ip "$@"' _
 
 # ----- final output -----
-echo -e "\n\033[1;33mValid IPs:\033[0m"
+echo -e "\n\033[1;33mScan completed.\033[0m"
 if [ -s "$temp_file" ]; then
+  echo -e "\033[1;32mValid IPs for $DOMAIN:\033[0m"
+  echo -e "\033[1;32m----------------------------------------\033[0m"
   cat "$temp_file"
+  echo -e "\033[1;32m----------------------------------------\033[0m"
+
   cp "$temp_file" "$RESULT_FILE"
-  echo -e "\n\033[1;34mSaved to:\033[0m $RESULT_FILE"
+  echo -e "\n\033[1;36mSaved results to:\033[0m"
+  echo -e "\033[1;34m$RESULT_FILE\033[0m"
 else
-  echo -e "\033[1;31mNone found.\033[0m"
+  echo -e "\033[1;31mNo valid IPs found.\033[0m"
 fi
 
 rm -f "$temp_file" "$shuffled_file"
-echo -e "\033[1;33mScan completed.\033[0m"
