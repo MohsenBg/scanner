@@ -1,6 +1,5 @@
 #!/bin/bash
 
-DOMAIN="www.siemens.com/global/en.html"
 PORT=443
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
@@ -16,7 +15,7 @@ echo "██████╔╝╚██████╔╝     ██████
 echo "╚═════╝  ╚═════╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝"
 echo -e "\033[0m"
 echo -e "\033[1;33m            BG  S C A N\033[0m"
-echo ""
+
 echo -e "\033[1;36m"
 echo "╔══════════════════════════════════════╗"
 echo "║                                      ║"
@@ -26,6 +25,21 @@ echo "║        Made by  MOHSEN BG            ║"
 echo "║                                      ║"
 echo "╚══════════════════════════════════════╝"
 echo -e "\033[0m"
+echo ""
+
+echo -ne "\033[1;36mEnter domain (e.g. www.example.com): \033[0m"
+read -r DOMAIN
+
+# sanitize domain input
+DOMAIN=$(echo "$DOMAIN" | sed 's|https\?://||; s|/.*||')
+
+if [ -z "$DOMAIN" ]; then
+  echo -e "\033[1;31mNo domain provided. Exiting.\033[0m"
+  exit 1
+fi
+
+echo -e "\033[1;33mScanning HTTPS for domain:\033[0m $DOMAIN"
+echo ""
 
 NO_DOWNLOAD=false
 
@@ -65,7 +79,6 @@ handle_interrupt() {
 
   if [ -s "$temp_file" ]; then
     cat "$temp_file"
-
     echo -e "\n\033[1;34mSaving results to:\033[0m $RESULT_FILE"
     cp "$temp_file" "$RESULT_FILE"
   else
@@ -98,7 +111,7 @@ while IFS= read -r ip; do
     "https://$DOMAIN")
 
   if [ "$http_code" != "000" ]; then
-    echo -e "\033[1;32m$ip - (HTTP $http_code)\033[0m"
+    echo -e "\033[1;32m$ip - HTTP $http_code\033[0m"
     echo "$ip" >>"$temp_file"
   else
     echo -e "\033[1;31m$ip does NOT serve $DOMAIN\033[0m"
@@ -109,6 +122,8 @@ done <"$shuffled_file"
 echo -e "\n\033[1;33mValid IPs for $DOMAIN:\033[0m"
 if [ -s "$temp_file" ]; then
   cat "$temp_file"
+  cp "$temp_file" "$RESULT_FILE"
+  echo -e "\n\033[1;34mSaved to:\033[0m $RESULT_FILE"
 else
   echo -e "\033[1;31mNone found.\033[0m"
 fi
