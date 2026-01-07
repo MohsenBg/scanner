@@ -1,12 +1,31 @@
 #!/bin/bash
 
-DOMAIN="www.siemens.com/global/en.html" # <<< CHANGE THIS TO YOUR DOMAIN
+DOMAIN="www.siemens.com/global/en.html"
 PORT=443
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
+RESULT_FILE="$SCRIPT_DIR/result_$TIMESTAMP.txt"
 
-echo -e "\033[1;33mWelcome to the IP Scanner!\033[0m"
-echo -e "\033[1;32mThis script was made by MOHSEN BG.\033[0m"
-echo -e "\033[1;34mStarting HTTPS scan for domain: $DOMAIN\033[0m"
+clear
+echo -e "\033[1;36m"
+echo "██████╗  ██████╗      ███████╗ ██████╗ █████╗ ███╗   ██╗"
+echo "██╔══██╗██╔════╝      ██╔════╝██╔════╝██╔══██╗████╗  ██║"
+echo "██████╔╝██║  ███╗     ███████╗██║     ███████║██╔██╗ ██║"
+echo "██╔══██╗██║   ██║     ╚════██║██║     ██╔══██║██║╚██╗██║"
+echo "██████╔╝╚██████╔╝     ███████║╚██████╗██║  ██║██║ ╚████║"
+echo "╚═════╝  ╚═════╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝"
+echo -e "\033[0m"
+echo -e "\033[1;33m            BG  S C A N\033[0m"
 echo ""
+echo -e "\033[1;36m"
+echo "╔══════════════════════════════════════╗"
+echo "║                                      ║"
+echo "║        🔍  IP SCANNER TOOL  🔍       ║"
+echo "║                                      ║"
+echo "║        Made by  MOHSEN BG            ║"
+echo "║                                      ║"
+echo "╚══════════════════════════════════════╝"
+echo -e "\033[0m"
 
 NO_DOWNLOAD=false
 
@@ -43,11 +62,16 @@ temp_file=$(mktemp)
 
 handle_interrupt() {
   echo -e "\n\033[1;33mInterrupted! Working IPs so far:\033[0m"
+
   if [ -s "$temp_file" ]; then
     cat "$temp_file"
+
+    echo -e "\n\033[1;34mSaving results to:\033[0m $RESULT_FILE"
+    cp "$temp_file" "$RESULT_FILE"
   else
     echo -e "\033[1;31mNone found.\033[0m"
   fi
+
   rm -f "$temp_file"
   exit 1
 }
