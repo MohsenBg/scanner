@@ -74,7 +74,7 @@ while IFS= read -r ip; do
     "https://$DOMAIN")
 
   if [ "$http_code" != "000" ]; then
-    echo -e "\033[1;32m$ip works for $DOMAIN (HTTP $http_code)\033[0m"
+    echo -e "\033[1;32m$ip - (HTTP $http_code)\033[0m"
     echo "$ip" >>"$temp_file"
   else
     echo -e "\033[1;31m$ip does NOT serve $DOMAIN\033[0m"
