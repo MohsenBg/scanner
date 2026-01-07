@@ -109,11 +109,15 @@ while IFS= read -r ip; do
   echo -e "\033[1;36m[$count] Testing $ip\033[0m"
 
   http_code=$(curl \
-    --resolve "$DOMAIN:$PORT:$ip" \
-    --connect-timeout 2 \
-    --max-time 4 \
-    -s -o /dev/null \
-    -w "%{http_code}" \
+    --resolve "$DOMAIN:443:$ip" \
+    --head \
+    --http1.1 \
+    --connect-timeout 1 \
+    --max-time 2 \
+    --retry 0 \
+    --silent \
+    --output /dev/null \
+    --write-out "%{http_code}" \
     "https://$DOMAIN")
 
   if [ "$http_code" != "000" ]; then
