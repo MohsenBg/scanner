@@ -7,8 +7,29 @@ TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
 RESULT_FILE="$SCRIPT_DIR/result_$TIMESTAMP.txt"
 
 clear
-echo -e "\033[1;33mBG SCAN — Parallel Mode\033[0m"
+echo -e "\033[1;36m"
+echo "██████╗  ██████╗      ███████╗ ██████╗ █████╗ ███╗   ██╗"
+echo "██╔══██╗██╔════╝      ██╔════╝██╔════╝██╔══██╗████╗  ██║"
+echo "██████╔╝██║  ███╗     ███████╗██║     ███████║██╔██╗ ██║"
+echo "██╔══██╗██║   ██║     ╚════██║██║     ██╔══██║██║╚██╗██║"
+echo "██████╔╝╚██████╔╝     ███████║╚██████╗██║  ██║██║ ╚████║"
+echo "╚═════╝  ╚═════╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝"
+echo -e "\033[0m"
+echo -e "\033[1;33m            BG  S C A N\033[0m"
 echo ""
+
+echo -e "\033[1;36m"
+echo "╔══════════════════════════════════════╗"
+echo "║                                      ║"
+echo "║        🔍  IP SCANNER TOOL  🔍       ║"
+echo "║                                      ║"
+echo "║        Made by  MOHSEN BG            ║"
+echo "║                                      ║"
+echo "╚══════════════════════════════════════╝"
+echo -e "\033[0m"
+echo ""
+
+echo -e "\033[1;33mBG SCAN — Parallel Mode (Active)\033[0m"
 
 # ----- read domain safely -----
 echo -ne "\033[1;36mEnter domain (e.g. www.example.com): \033[0m"
