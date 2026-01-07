@@ -63,7 +63,7 @@ while IFS= read -r ip; do
   [ -z "$ip" ] && continue
 
   ((count++))
-  echo -e "\033[1;36m[$count] Testing $ip for $DOMAIN\033[0m"
+  echo -e "\033[1;36m[$count] Testing $ip\033[0m"
 
   http_code=$(curl \
     --resolve "$DOMAIN:$PORT:$ip" \
