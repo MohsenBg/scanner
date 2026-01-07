@@ -15,6 +15,7 @@ echo "██████╔╝╚██████╔╝     ██████
 echo "╚═════╝  ╚═════╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝"
 echo -e "\033[0m"
 echo -e "\033[1;33m            BG  S C A N\033[0m"
+echo ""
 
 echo -e "\033[1;36m"
 echo "╔══════════════════════════════════════╗"
@@ -27,10 +28,15 @@ echo "╚═══════════════════════�
 echo -e "\033[0m"
 echo ""
 
-echo -ne "\033[1;36mEnter domain (e.g. www.example.com): \033[0m"
-read -r DOMAIN
+# ---- FIX: always read from terminal ----
+if [ ! -t 0 ]; then
+  echo -e "\033[1;33m[!] stdin is not a TTY — forcing /dev/tty\033[0m"
+fi
 
-# sanitize domain input
+echo -ne "\033[1;36mEnter domain (e.g. www.example.com): \033[0m"
+read -r DOMAIN </dev/tty
+
+# sanitize domain
 DOMAIN=$(echo "$DOMAIN" | sed 's|https\?://||; s|/.*||')
 
 if [ -z "$DOMAIN" ]; then
