@@ -53,8 +53,6 @@ curl -s -o ips.txt "$ips_url" || exit 1
 temp_file=$(mktemp)
 shuffled_file=$(mktemp)
 
-trap 'echo -e "\nInterrupted. Saving results."; cp "$temp_file" "$RESULT_FILE"; exit 1' SIGINT
-
 awk 'BEGIN{srand()} {print rand(), $0}' ips.txt | sort -n | cut -d' ' -f2- >"$shuffled_file"
 
 export DOMAIN PORT temp_file
@@ -88,15 +86,15 @@ test_ip() {
 handle_interrupt() {
   echo -e "\n\033[1;33mInterrupted! Valid IPs found so far:\033[0m"
 
-  # stop all parallel workers
-  kill 0 2>/dev/null
+  # stop xargs cleanly
+  pkill -P $$ xargs 2>/dev/null
 
   if [ -s "$temp_file" ]; then
     echo -e "\033[1;32m----------------------------------------\033[0m"
-    cat "$temp_file"
+    sort -u "$temp_file"
     echo -e "\033[1;32m----------------------------------------\033[0m"
 
-    cp "$temp_file" "$RESULT_FILE"
+    sort -u "$temp_file" >"$RESULT_FILE"
     echo -e "\n\033[1;36mSaved results to:\033[0m"
     echo -e "\033[1;34m$RESULT_FILE\033[0m"
   else
